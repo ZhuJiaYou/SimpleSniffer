@@ -23,16 +23,11 @@ int analyze_frame(const u_char *pkt, struct datapkt *data, struct pktcount *npac
 	switch (data->ethh->type)
 	{
 	case 0x0806:
-		return analyze_arp((u_char *)pkt + 14, data, npacket);      //mac 头大小为14
+		return analyze_arp((u_char *)pkt + 14, data, npacket);  //mac 头大小为14
 		break;
 	case 0x0800:
 		return analyze_ip((u_char *)pkt + 14, data, npacket);
 		break;
-		/*
-	case 0x86dd:
-		return analyze_ip6((u_char *)pkt + 14, data, npacket);
-		return -1;
-		break;*/
 	default:
 		npacket->n_other++;
 		return -1;
@@ -41,7 +36,7 @@ int analyze_frame(const u_char *pkt, struct datapkt *data, struct pktcount *npac
 	return 1;
 }
 
-//分析网络层：ARP
+//分析网络层ARP
 int analyze_arp(const u_char *pkt, datapkt *data, struct pktcount *npacket)
 {
 	int i;
@@ -118,77 +113,6 @@ int analyze_ip(const u_char *pkt, datapkt *data, struct pktcount *npacket)
 	return 1;
 }
 
-/*
-//分析网络层：IPV6
-int analyze_ip6(const u_char *pkt, datapkt *data, struct pktcount *npacket)
-{
-	int i;
-	struct iphdr6 *iph6 = (struct iphdr6 *)pkt;
-	data->iph6 = (struct iphdr6 *)malloc(sizeof(struct iphdr6));
-
-	if (NULL == data->iph6)
-		return -1;
-
-	npacket->n_ip6++;
-
-	data->iph6->version = iph6->version;
-	data->iph6->flowtype = iph6->flowtype;
-	data->iph6->flowid = iph6->flowid;
-	data->iph6->plen = ntohs(iph6->plen);
-	data->iph6->nh = iph6->nh;
-	data->iph6->hlim = iph6->hlim;
-
-	for (i = 0; i < 16; i++)
-	{
-		data->iph6->saddr[i] = iph6->saddr[i];
-		data->iph6->daddr[i] = iph6->daddr[i];
-	}
-
-	switch (iph6->nh)
-	{
-	case 0x3a:
-		return analyze_icmp6((u_char *)iph6 + 40, data, npacket);
-		break;
-	case 0x06:
-		return analyze_tcp((u_char *)iph6 + 40, data, npacket);
-		break;
-	case 0x11:
-		return analyze_udp((u_char *)iph6 + 40, data, npacket);
-		break;
-	default:
-		return-1;
-		break;
-	}
-
-	return 1;
-}
-
-//分析传输层：ICMPv6
-int analyze_icmp6(const u_char *pkt, datapkt *data, struct pktcount *npacket)
-{
-int i;
-struct icmphdr6 *icmph6 = (struct icmphdr6 *)pkt;
-data->icmph6 = (struct icmphdr6 *)malloc(sizeof(struct icmphdr6));
-
-if (NULL == data->icmph6)
-return -1;
-
-data->icmph6->chksum = icmph6->chksum;
-data->icmph6->code = icmph6->code;
-data->icmph6->seq = icmph6->seq;
-data->icmph6->type = icmph6->type;
-data->icmph6->op_len = icmph6->op_len;
-data->icmph6->op_type = icmph6->op_type;
-for (i = 0; i < 6; i++)
-{
-data->icmph6->op_ethaddr[i] = icmph6->op_ethaddr[i];
-}
-strcpy(data->pktType, "ICMPv6");
-npacket->n_icmp6++;
-return 1;
-}
-*/
-
 //分析传输层：ICMP
 int analyze_icmp(const u_char *pkt, datapkt *data, struct pktcount *npacket)
 {
@@ -206,7 +130,6 @@ int analyze_icmp(const u_char *pkt, datapkt *data, struct pktcount *npacket)
 	npacket->n_icmp++;
 	return 1;
 }
-
 
 //分析传输层：TCP
 int analyze_tcp(const u_char *pkt, datapkt *data, struct pktcount *npacket)
@@ -237,13 +160,14 @@ int analyze_tcp(const u_char *pkt, datapkt *data, struct pktcount *npacket)
 	data->tcph->window = tcph->window;
 	data->tcph->opt = tcph->opt;
 
-	//http??
+	//是否为http
 	if (ntohs(tcph->dport) == 80 || ntohs(tcph->sport) == 80)
 	{
 		npacket->n_http++;
 		strcpy(data->pktType, "HTTP");
 	}
-	else {
+	else 
+	{
 		npacket->n_tcp++;
 		strcpy(data->pktType, "TCP");
 	}

@@ -44,8 +44,6 @@ END_MESSAGE_MAP()
 
 // CSimpleSnifferDlg 对话框
 
-
-
 CSimpleSnifferDlg::CSimpleSnifferDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_SIMPLESNIFFER_DIALOG, pParent)
 {
@@ -79,7 +77,6 @@ END_MESSAGE_MAP()
 
 
 // CSimpleSnifferDlg 消息处理程序
-
 BOOL CSimpleSnifferDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -126,7 +123,7 @@ BOOL CSimpleSnifferDlg::OnInitDialog()
 	m_comboRule.AddString(_T("选择过滤规则(可选)"));
 
 	//初始化接口列表
-	if(initWincap()<0)
+	if(initWincap() < 0)
 		return FALSE;
 	for(dev = alldev; dev; dev = dev->next)
 	{
@@ -147,7 +144,7 @@ BOOL CSimpleSnifferDlg::OnInitDialog()
 	m_buttonStop.EnableWindow(FALSE);
 	m_buttonSave.EnableWindow(FALSE);
 
-	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+	return TRUE;  //除非将焦点设置到控件，否则返回 TRUE
 }
 
 //初始化winpcap
@@ -191,9 +188,9 @@ int CSimpleSnifferDlg::startCap()
 		dev = dev->next;
 	if((adhandle = pcap_open_live(dev->name,  // 设备名
 		 65536,  //捕获数据包长度																					
-		 1,  // 设置混杂模式(非0意味着是混杂模式)
-		 1000,  // 读超时设置
-		 errbuf  // 错误信息
+		 1,  //设置混杂模式(非0意味着是混杂模式)
+		 1000,  //读超时设置
+		 errbuf  //错误信息
 	   )) == NULL)
 	{
 		MessageBox(_T("无法打开接口：" + CString(dev->description)));
@@ -225,7 +222,8 @@ int CSimpleSnifferDlg::startCap()
 			return -1;
 		}
 	}
-	else {
+	else 
+	{
 		CString str;
 		char *filter;
 		int len, x;
@@ -338,9 +336,6 @@ DWORD WINAPI capThread(LPVOID lpParameter)
 			pcap_dump((unsigned char *)pthis->dumpfile, header, pkt_data);
 		}
 
-		//更新各类数据包计数
-		//pthis->sniffer_updateNPacket();
-
 		//将本地化后的数据装入一个链表中，以便后来使用		
 		ppkt_data = (u_char *)malloc(header->len);
 		memcpy(ppkt_data, pkt_data, header->len);
@@ -367,7 +362,6 @@ DWORD WINAPI capThread(LPVOID lpParameter)
 		timestr.Format(_T("%d/%d/%d  %d:%d:%d"), data->time[0], data->time[1], data->time[2], 
 			                                     data->time[3], data->time[4], data->time[5]);
 		pthis->m_listPackage.SetItemText(nItem, 1, timestr);
-		//pthis->m_listPackage.setitem
 
 		//显示长度
 		buf.Empty();
@@ -402,18 +396,6 @@ DWORD WINAPI capThread(LPVOID lpParameter)
 			in.S_un.S_addr = data->iph->saddr;
 			buf = CString(inet_ntoa(in));
 		}
-		/*
-		else if(0x86dd == data->ethh->type) 
-		{
-			int n;
-			for(n = 0; n<8; n++)
-			{
-				if(n <= 6)
-					buf.AppendFormat(_T("%02x:"), data->iph6->saddr[n]);
-				else
-					buf.AppendFormat(_T("%02x"), data->iph6->saddr[n]);
-			}
-		}*/
 		pthis->m_listPackage.SetItemText(nItem, 6, buf);
 
 		//获得目的IP
@@ -429,18 +411,6 @@ DWORD WINAPI capThread(LPVOID lpParameter)
 			in.S_un.S_addr = data->iph->daddr;
 			buf = CString(inet_ntoa(in));
 		}
-		/*
-		else if(0x86dd == data->ethh->type) 
-		{
-			int n;
-			for(n = 0; n<8; n++)
-			{
-				if (n <= 6)
-					buf.AppendFormat(_T("%02x:"), data->iph6->daddr[n]);
-				else
-					buf.AppendFormat(_T("%02x"), data->iph6->daddr[n]);
-			}
-		}*/
 		pthis->m_listPackage.SetItemText(nItem, 7, buf);
 
 		//对包计数
@@ -531,8 +501,6 @@ HCURSOR CSimpleSnifferDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
 void CSimpleSnifferDlg::OnBnClickedStartButton()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -549,7 +517,6 @@ void CSimpleSnifferDlg::OnBnClickedStartButton()
 	this->m_localDataList.RemoveAll();  //每次一开始就将以前存的数据清空掉
 	this->m_netDataList.RemoveAll();
 	memset(&(this->npacket), 0, sizeof(struct pktcount));
-	//this->sniffer_updateNPacket();
 
 	if (this->startCap() < 0)
 		return;
@@ -561,7 +528,6 @@ void CSimpleSnifferDlg::OnBnClickedStartButton()
 	this->m_buttonStop.EnableWindow(TRUE);
     this->m_buttonSave.EnableWindow(FALSE);
 }
-
 
 void CSimpleSnifferDlg::OnBnClickedStopButton()
 {
@@ -579,7 +545,7 @@ void CSimpleSnifferDlg::OnBnClickedStopButton()
 	this->m_buttonSave.EnableWindow(TRUE);
 }
 
-
+//设置信息表样式
 void CSimpleSnifferDlg::OnNMCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLVCUSTOMDRAW pNMCD = (LPNMLVCUSTOMDRAW)pNMHDR;
@@ -597,8 +563,6 @@ void CSimpleSnifferDlg::OnNMCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 		struct datapkt * local_data = (struct datapkt *)this->m_localDataList.GetAt(pos);
 		strcpy(buf, local_data->pktType);
 
-		//if (strcmp(buf, "IPV6") == 0)
-			//crText = RGB(111, 224, 254);
 		if(strcmp(buf, "UDP") == 0)
 			crText = RGB(146, 248, 172);
 		else if(strcmp(buf, "TCP") == 0)
@@ -609,8 +573,6 @@ void CSimpleSnifferDlg::OnNMCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 			crText = RGB(250, 154, 221);
 		else if(strcmp(buf, "HTTP") == 0)
 			crText = RGB(167, 156, 209);
-		//else if (strcmp(buf, "ICMPv6") == 0)
-			//crText = RGB(189, 254, 76);
 
 		pNMCD->clrTextBk = crText;
 		*pResult = CDRF_DODEFAULT;
@@ -844,134 +806,10 @@ int CSimpleSnifferDlg::updateTree(int index)
 			str.Format(_T("校验和：0x%02x"), local_data->udph->check);
 			this->m_treePackage.InsertItem(str, udp);
 		}
-	}/*
-	else if(0x86dd == local_data->ethh->type)  //IPv6
-	{
-		HTREEITEM ip6 = this->m_treePackage.InsertItem(_T("IPv6协议头"), data);
-
-		str.Format(_T("版本：%d"), local_data->iph6->flowtype);
-		this->m_treePackage.InsertItem(str, ip6);
-		str.Format(_T("流类型：%d"), local_data->iph6->version);
-		this->m_treePackage.InsertItem(str, ip6);
-
-		str.Format(_T("流标签：%d"), local_data->iph6->flowid);
-		this->m_treePackage.InsertItem(str, ip6);
-		str.Format(_T("有效载荷长度：%d"), local_data->iph6->plen);
-		this->m_treePackage.InsertItem(str, ip6);
-		str.Format(_T("下一个首部：0x%02x"), local_data->iph6->nh);
-		this->m_treePackage.InsertItem(str, ip6);
-		str.Format(_T("跳限制：%d"), local_data->iph6->hlim);
-		this->m_treePackage.InsertItem(str, ip6);
-
-		str.Format(_T("源地址："));
-		int n;
-		for(n = 0; n<8; n++)
-		{
-			if(n <= 6)
-				str.AppendFormat(_T("%02x:"), local_data->iph6->saddr[n]);
-			else
-				str.AppendFormat(_T("%02x"), local_data->iph6->saddr[n]);
-		}
-		this->m_treePackage.InsertItem(str, ip6);
-
-		str.Format(_T("目的地址："));
-		for (n = 0; n<8; n++)
-		{
-			if (n <= 6)
-				str.AppendFormat(_T("%02x:"), local_data->iph6->saddr[n]);
-			else
-				str.AppendFormat(_T("%02x"), local_data->iph6->saddr[n]);
-		}
-		this->m_treePackage.InsertItem(str, ip6);
-
-		//处理传输层ICMPv6、UDP、TCP
-		if (0x3a == local_data->iph6->nh)  //ICMPv6
-		{
-			HTREEITEM icmp6 = this->m_treePackage.InsertItem(_T("ICMPv6协议头"), data);
-
-			str.Format(_T("类型：%d"), local_data->icmph6->type);
-			this->m_treePackage.InsertItem(str, icmp6);
-			str.Format(_T("代码：%d"), local_data->icmph6->code);
-			this->m_treePackage.InsertItem(str, icmp6);
-			str.Format(_T("序号：%d"), local_data->icmph6->seq);
-			this->m_treePackage.InsertItem(str, icmp6);
-			str.Format(_T("校验和：%d"), local_data->icmph6->chksum);
-			this->m_treePackage.InsertItem(str, icmp6);
-			str.Format(_T("选项-类型：%d"), local_data->icmph6->op_type);
-			this->m_treePackage.InsertItem(str, icmp6);
-			str.Format(_T("选项-长度%d"), local_data->icmph6->op_len);
-			this->m_treePackage.InsertItem(str, icmp6);
-			str.Format(_T("选项-链路层地址："));
-			int i;
-			for(i = 0; i<6; i++)
-			{
-				if(i <= 4)
-					str.AppendFormat(_T("%02x-"), local_data->icmph6->op_ethaddr[i]);
-				else
-					str.AppendFormat(_T("%02x"), local_data->icmph6->op_ethaddr[i]);
-			}
-			this->m_treePackage.InsertItem(str, icmp6);
-
-		}
-		else if(0x06 == local_data->iph6->nh)  //TCP
-		{
-
-			HTREEITEM tcp = this->m_treePackage.InsertItem(_T("TCP协议头"), data);
-
-			str.Format(_T("  源端口：%d"), local_data->tcph->sport);
-			this->m_treePackage.InsertItem(str, tcp);
-			str.Format(_T("  目的端口：%d"), local_data->tcph->dport);
-			this->m_treePackage.InsertItem(str, tcp);
-			str.Format(_T("  序列号：0x%02x"), local_data->tcph->seq);
-			this->m_treePackage.InsertItem(str, tcp);
-			str.Format(_T("  确认号：%d"), local_data->tcph->ack_seq);
-			this->m_treePackage.InsertItem(str, tcp);
-			str.Format(_T("  头部长度：%d"), local_data->tcph->doff);
-
-			HTREEITEM flag = this->m_treePackage.InsertItem(_T("标志位"), tcp);
-
-			str.Format(_T("cwr %d"), local_data->tcph->cwr);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("ece %d"), local_data->tcph->ece);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("urg %d"), local_data->tcph->urg);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("ack %d"), local_data->tcph->ack);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("psh %d"), local_data->tcph->psh);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("rst %d"), local_data->tcph->rst);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("syn %d"), local_data->tcph->syn);
-			this->m_treePackage.InsertItem(str, flag);
-			str.Format(_T("fin %d"), local_data->tcph->fin);
-			this->m_treePackage.InsertItem(str, flag);
-
-			str.Format(_T("  紧急指针：%d"), local_data->tcph->urg_ptr);
-			this->m_treePackage.InsertItem(str, tcp);
-			str.Format(_T("  校验和：0x%02x"), local_data->tcph->check);
-			this->m_treePackage.InsertItem(str, tcp);
-			str.Format(_T("  选项：%d"), local_data->tcph->opt);
-			this->m_treePackage.InsertItem(str, tcp);
-		}
-		else if(0x11 == local_data->iph6->nh)  //UDP
-		{
-			HTREEITEM udp = this->m_treePackage.InsertItem(_T("UDP协议头"), data);
-
-			str.Format(_T("源端口：%d"), local_data->udph->sport);
-			this->m_treePackage.InsertItem(str, udp);
-			str.Format(_T("目的端口：%d"), local_data->udph->dport);
-			this->m_treePackage.InsertItem(str, udp);
-			str.Format(_T("总长度：%d"), local_data->udph->len);
-			this->m_treePackage.InsertItem(str, udp);
-			str.Format(_T("校验和：0x%02x"), local_data->udph->check);
-			this->m_treePackage.InsertItem(str, udp);
-		}
-	}*/
+	}
 
 	return 1;
 }
-
 
 //确保非网卡选项不被选中
 void CSimpleSnifferDlg::OnCbnSelchangeNetworkCombo()
@@ -991,3 +829,4 @@ void CSimpleSnifferDlg::OnCbnSelchangeNetworkCombo()
 		m_LastSel = index;
 	}
 }
+

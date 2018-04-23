@@ -9,13 +9,12 @@ class CSimpleSnifferDlg : public CDialogEx
 {
 // 构造
 public:
-	CSimpleSnifferDlg(CWnd* pParent = NULL);	// 标准构造函数
+	CSimpleSnifferDlg(CWnd* pParent = NULL);  //标准构造函数
 	int initWincap();
 	int startCap();
 	int updateEdit(int);
 	int saveFile();
 	int updateTree(int);
-
 
 	int devCount;
 	struct pktcount npacket;  //各类数据包计数
@@ -29,7 +28,7 @@ public:
 	char filename[64];  //文件名称
 	HANDLE m_ThreadHandle;  //线程
 
-// 对话框数据
+//对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_SIMPLESNIFFER_DIALOG };
 #endif
@@ -38,11 +37,11 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
 
-// 实现
+//实现
 protected:
 	HICON m_hIcon;
 
-	// 生成的消息映射函数
+	//生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

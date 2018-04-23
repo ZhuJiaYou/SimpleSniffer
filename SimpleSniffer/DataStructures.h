@@ -8,7 +8,7 @@
 #define BIG_ENDIAN    4321
 
 
-//Mac帧头 占14个字节
+//Mac帧头 14字节
 typedef struct ethhdr
 {
 	u_char dest[6];  //6个字节 目标地址
@@ -30,7 +30,7 @@ typedef struct arphdr
 	u_char ar_destip[4];  //接收方IP
 };
 
-//定义IP头 
+//IP头 
 typedef struct iphdr
 {
 #if defined(LITTLE_ENDIAN)
@@ -52,7 +52,7 @@ typedef struct iphdr
 	u_int	op_pad;  //选项等
 };
 
-//定义TCP头
+//TCP头
 typedef struct tcphdr
 {
 	u_short sport;  //源端口地址  16位
@@ -88,7 +88,7 @@ typedef struct tcphdr
 	u_int opt;  //选项
 };
 
-//定义UDP头
+//UDP头
 typedef struct udphdr
 {
 	u_short sport;  //源端口 16位
@@ -97,7 +97,7 @@ typedef struct udphdr
 	u_short check;  //校验和 16位	
 };
 
-//定义ICMP
+//ICMP
 typedef struct icmphdr
 {
 	u_char type;  //8位 类型
@@ -106,45 +106,14 @@ typedef struct icmphdr
 	u_char chksum;  //8位校验和
 };
 
-/*
-//定义IPv6
-typedef struct iphdr6
-{
-
-	u_int version : 4,  //版本
-		flowtype : 8,  //流类型
-		flowid : 20;  //流标签
-
-	u_short plen;  //有效载荷长度
-	u_char nh;  //下一个头部
-	u_char hlim;  //跳限制
-	u_short saddr[8];  //源地址
-	u_short daddr[8];  //目的地址
-};
-
-//定义ICMPv6
-typedef struct icmphdr6
-{
-	u_char type;  //8位 类型
-	u_char code;  //8位 代码
-	u_char seq;  //序列号 8位
-	u_char chksum;  //8位校验和
-	u_char op_type;	 //选项：类型
-	u_char op_len;  //选项：长度
-	u_char op_ethaddr[6];  //选项：链路层地址
-};
-*/
-
 //对各种包进行计数
 typedef struct pktcount
 {
 	int n_ip;
-	//int n_ip6;
 	int n_arp;
 	int n_tcp;
 	int n_udp;
 	int n_icmp;
-	//int n_icmp6;
 	int n_http;
 	int n_other;
 	int n_sum;
@@ -161,10 +130,8 @@ typedef struct datapkt
 
 	struct arphdr* arph;  //ARP包头
 	struct iphdr* iph;  //IP包头
-	//struct iphdr6* iph6;  //IPV6
 
 	struct icmphdr* icmph;  //ICMP包头
-	//struct icmphdr6* icmph6;  //ICMPv6包头
 	struct udphdr* udph;  //UDP包头
 	struct tcphdr* tcph;  //TCP包头
 
